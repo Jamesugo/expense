@@ -50,7 +50,17 @@ app.use('/api/users', require('./routes/users'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'ExpenseTracker API is running' });
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.json({
+    status: 'ok',
+    message: 'ExpenseTracker API is running',
+    database: dbStatus,
+    env: {
+      hasMongoUri: !!process.env.MONGO_URI,
+      nodeEnv: process.env.NODE_ENV,
+    }
+  });
 });
 
 // Error handler (must be last)
