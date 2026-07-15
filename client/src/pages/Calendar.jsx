@@ -34,7 +34,11 @@ export default function Calendar() {
     }
   }, [year, month]);
 
-  useEffect(() => { fetchCalendar(); }, [fetchCalendar]);
+  useEffect(() => {
+    fetchCalendar();
+    window.addEventListener('expense-updated', fetchCalendar);
+    return () => window.removeEventListener('expense-updated', fetchCalendar);
+  }, [fetchCalendar]);
 
   const navigate = (dir) => {
     if (dir === -1 && month === 1) { setMonth(12); setYear((y) => y - 1); }

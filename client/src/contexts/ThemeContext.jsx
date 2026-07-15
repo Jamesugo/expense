@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext.jsx';
 import api from '../api/axios.js';
 
 const ThemeContext = createContext(null);

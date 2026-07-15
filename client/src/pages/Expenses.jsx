@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Download, Pencil, Trash2, ChevronLeft, ChevronRight, X, SlidersHorizontal } from 'lucide-react';
+import { Search, Download, Pencil, Trash2, ChevronLeft, ChevronRight, X, SlidersHorizontal } from 'lucide-react';
 import { getExpenses, deleteExpense } from '../api/index.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { formatCurrency } from '../utils/formatCurrency.js';
@@ -30,7 +30,6 @@ export default function Expenses() {
   const [editLoading, setEditLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [allForExport, setAllForExport] = useState([]);
 
   const [filters, setFilters] = useState({
     search: '', category: '', startDate: '', endDate: '',
@@ -52,7 +51,11 @@ export default function Expenses() {
     }
   }, [filters]);
 
-  useEffect(() => { fetchExpenses(); }, [fetchExpenses]);
+  useEffect(() => {
+    fetchExpenses();
+    window.addEventListener('expense-updated', fetchExpenses);
+    return () => window.removeEventListener('expense-updated', fetchExpenses);
+  }, [fetchExpenses]);
 
   const handleDelete = async () => {
     setDeleteLoading(true);
@@ -61,6 +64,7 @@ export default function Expenses() {
       toast.success('Expense deleted');
       setDeleteTarget(null);
       fetchExpenses();
+      window.dispatchEvent(new CustomEvent('expense-updated'));
     } catch {
       toast.error('Failed to delete expense');
     } finally {
@@ -75,6 +79,7 @@ export default function Expenses() {
       toast.success('Expense updated!');
       setEditTarget(null);
       fetchExpenses();
+      window.dispatchEvent(new CustomEvent('expense-updated'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update expense');
     } finally {

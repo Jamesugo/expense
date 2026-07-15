@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  LineChart, Line, Area, AreaChart,
+  Area, AreaChart,
 } from 'recharts';
-import { getSummary, getExpenses } from '../api/index.js';
+import { getSummary } from '../api/index.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { formatCurrency } from '../utils/formatCurrency.js';
 import { CATEGORY_COLORS } from '../utils/categories.js';
@@ -53,10 +53,16 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getSummary()
-      .then(({ data }) => setSummary(data.data))
-      .catch(() => toast.error('Failed to load analytics'))
-      .finally(() => setLoading(false));
+    const fetchAnalytics = () => {
+      getSummary()
+        .then(({ data }) => setSummary(data.data))
+        .catch(() => toast.error('Failed to load analytics'))
+        .finally(() => setLoading(false));
+    };
+
+    fetchAnalytics();
+    window.addEventListener('expense-updated', fetchAnalytics);
+    return () => window.removeEventListener('expense-updated', fetchAnalytics);
   }, []);
 
   if (loading) {

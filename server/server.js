@@ -1,3 +1,11 @@
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  // Fallback if DNS server configuration is restricted
+}
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');

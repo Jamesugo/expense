@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, DollarSign, Calendar, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Calendar, BarChart3 } from 'lucide-react';
 import { getSummary } from '../api/index.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { formatCurrency } from '../utils/formatCurrency.js';
@@ -45,10 +45,16 @@ export default function Dashboard() {
   const fc = (v) => formatCurrency(v, currency);
 
   useEffect(() => {
-    getSummary()
-      .then(({ data }) => setSummary(data.data))
-      .catch(() => toast.error('Failed to load summary'))
-      .finally(() => setLoading(false));
+    const fetchSummary = () => {
+      getSummary()
+        .then(({ data }) => setSummary(data.data))
+        .catch(() => toast.error('Failed to load summary'))
+        .finally(() => setLoading(false));
+    };
+
+    fetchSummary();
+    window.addEventListener('expense-updated', fetchSummary);
+    return () => window.removeEventListener('expense-updated', fetchSummary);
   }, []);
 
   const today = format(new Date(), 'EEEE, MMMM d');

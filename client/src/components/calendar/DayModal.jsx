@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Pencil, Trash2, Clock, ChevronRight } from 'lucide-react';
+import { X, Plus, Pencil, Trash2, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getExpensesByDate, createExpense, updateExpense, deleteExpense } from '../../api/index.js';
 import { useAuth } from '../../contexts/AuthContext.jsx';
@@ -52,6 +52,7 @@ export default function DayModal({ isOpen, onClose, date, onUpdate }) {
       toast.success('Expense added!');
       await fetchExpenses();
       onUpdate?.();
+      window.dispatchEvent(new CustomEvent('expense-updated'));
       setView('list');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add expense');
@@ -67,6 +68,7 @@ export default function DayModal({ isOpen, onClose, date, onUpdate }) {
       toast.success('Expense updated!');
       await fetchExpenses();
       onUpdate?.();
+      window.dispatchEvent(new CustomEvent('expense-updated'));
       setView('list');
       setEditTarget(null);
     } catch (err) {
@@ -83,6 +85,7 @@ export default function DayModal({ isOpen, onClose, date, onUpdate }) {
       toast.success('Expense deleted');
       await fetchExpenses();
       onUpdate?.();
+      window.dispatchEvent(new CustomEvent('expense-updated'));
       setDeleteTarget(null);
     } catch {
       toast.error('Failed to delete expense');
